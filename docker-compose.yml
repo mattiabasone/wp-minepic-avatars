@@ -1,0 +1,30 @@
+services:
+
+  wordpress:
+    image: wordpress
+    ports:
+      - "8432:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - ./build/minepic-avatars:/var/www/html/wp-content/plugins/minepic-avatars
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_ROOT_PASSWORD: root
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

@@ -1,7 +1,11 @@
 <?php
 /**
- * Plugin Name: Minepic Avatars
+ * Plugin Name: Minepic - Minecraft Avatars
+ * Author: Mattia Basone
+ * Author URI: https://github.com/mattiabasone
  * Description: Replaces avatars with Minecraft avatars from minepic.org.
+ * License: GPLv3
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.md
  * Version: 1.0.0
  * Requires PHP: 7.4
  */
@@ -175,8 +179,10 @@ add_shortcode(
 		}
 		$user_id = get_current_user_id();
 		$notice  = '';
-		if ( isset( $_POST['minepic_username'] ) && wp_verify_nonce( $_POST['minepic_nonce'] ?? '', 'minepic_save' ) ) {
-			$ok     = minepic_save_username( $user_id, wp_unslash( $_POST['minepic_username'] ) );
+        $input_minecraft_username = $_POST['minepic_username'] ?? null;
+
+		if (null !== $input_minecraft_username && wp_verify_nonce( wp_unslash($input_minecraft_username) ?? '', 'minepic_save' )) {
+			$ok     = minepic_save_username( $user_id, wp_unslash( $input_minecraft_username ) );
 			$notice = $ok
 				? '<p>Saved.</p>'
 				: '<p>Saved, but the format is invalid: your avatar will use your login name or Steve/Alex.</p>';
