@@ -1,0 +1,3 @@
+.wp-block-avatar img, .wp-block-avatar.is-style-rounded img {
+    border-radius:0
+}

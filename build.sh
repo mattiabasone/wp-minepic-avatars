@@ -3,5 +3,6 @@
 mkdir -p ./build/minepic-avatars
 rm -rf ./build/minepic-avatars/*
 
+cp -R assets/ ./build/minepic-avatars/assets
 cp readme.txt ./build/minepic-avatars/readme.txt
 cp minepic-avatars.php ./build/minepic-avatars/minepic-avatars.php

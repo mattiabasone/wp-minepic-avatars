@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Minepic - Minecraft Avatars
+ * Plugin Name: Minepic - Avatars for Minecraft
  * Author: Mattia Basone
  * Author URI: https://github.com/mattiabasone
  * Description: Replaces avatars with Minecraft avatars from minepic.org.
@@ -11,6 +11,8 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+
+define( 'MINEPIC_VERSION', '1.0.0' );
 
 function minepic_is_valid_username( string $name ): bool {
 	return (bool) preg_match( '/^[A-Za-z0-9_]{3,16}$/', $name );
@@ -89,13 +91,12 @@ add_filter(
 	2
 );
 
+function minepic_enqueue_style() {
+    wp_enqueue_style( 'minepic_css', plugins_url( 'assets/minepic.css', __FILE__ ), [], MINEPIC_VERSION );
+}
+
 // Block themes round the Avatar block; Minecraft skins should stay square. Beats `:root :where(.wp-block-avatar img)`.
-add_action(
-	'wp_head',
-	function () {
-		echo '<style>.wp-block-avatar img,.wp-block-avatar.is-style-rounded img{border-radius:0}</style>';
-	}
-);
+add_action( 'wp_enqueue_scripts', 'minepic_enqueue_style' );
 
 // Profile field (wp-admin).
 function minepic_profile_field( $user ) {
@@ -154,21 +155,15 @@ add_action(
 
 // Core has no hook to disable "Default Avatar" (it is registered at file scope in options-discussion.php), so do it client-side.
 // Disabled inputs aren't submitted, so the stored avatar_default value stays untouched.
-add_action(
-	'admin_footer-options-discussion.php',
-	function () {
-		?>
-		<script>
-			document.querySelectorAll('input[name="avatar_default"]').forEach(function (i) { i.disabled = true; });
-			var row = document.querySelector('input[name="avatar_default"]');
-			if (row) {
-				row = row.closest('td');
-				row.insertAdjacentHTML('afterbegin', '<p><strong>The Minepic Avatars plugin handles default avatars (Minecraft username, then login name, then Steve/Alex).</strong></p>');
-			}
-		</script>
-		<?php
+
+function minepic_enqueue_admin_script( $hook ) {
+	if ( 'options-discussion.php' !== $hook ) {
+		return;
 	}
-);
+	wp_enqueue_script( 'minepic_admin_js', plugins_url( 'assets/minepic-admin.js', __FILE__ ), [], MINEPIC_VERSION, true );
+}
+
+add_action( 'admin_enqueue_scripts', 'minepic_enqueue_admin_script' );
 
 // [minepic_username_form]: frontend editor for the current user's own field.
 add_shortcode(
@@ -179,7 +174,11 @@ add_shortcode(
 		}
 		$user_id = get_current_user_id();
 		$notice  = '';
-        $input_minecraft_username = $_POST['minepic_username'] ?? null;
+
+        $input_minecraft_username = null;
+        if (isset($_POST['minepic_username'])) {
+            $input_minecraft_username = sanitize_text_field($_POST['minepic_username']);
+        }
 
 		if (null !== $input_minecraft_username && wp_verify_nonce( wp_unslash($input_minecraft_username) ?? '', 'minepic_save' )) {
 			$ok     = minepic_save_username( $user_id, wp_unslash( $input_minecraft_username ) );

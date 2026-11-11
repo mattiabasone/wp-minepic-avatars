@@ -1,4 +1,4 @@
-=== Minepic - Minecraft Avatars ===
+=== Minepic - Avatars for Minecraft ===
 Contributors: mattiabasone
 Donate link: https://www.paypal.me/mattiabasone
 Tags: avatar, minecraft, skins, profile, users
