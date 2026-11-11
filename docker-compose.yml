@@ -10,7 +10,7 @@ services:
       WORDPRESS_DB_PASSWORD: examplepass
       WORDPRESS_DB_NAME: exampledb
     volumes:
-      - ./build/minepic-avatars:/var/www/html/wp-content/plugins/minepic-avatars
+      - ./build/minepic-avatars-for-minecraft:/var/www/html/wp-content/plugins/minepic-avatars-for-minecraft
     depends_on:
       db:
         condition: service_healthy

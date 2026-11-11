@@ -35,8 +35,7 @@ function minepic_url( string $type, string $name, int $size ): string {
 	return "https://minepic.org/{$type}/{$name}/{$size}";
 }
 
-function minepic_save_username( int $user_id, string $raw ): bool {
-	$name = sanitize_text_field( $raw );
+function minepic_save_username( int $user_id, string $name ): bool {
 	if ( '' === $name ) {
 		delete_user_meta( $user_id, 'minepic_username' );
 		return true;
@@ -118,7 +117,7 @@ add_action( 'edit_user_profile', 'minepic_profile_field' );
 // Core has already verified the update-user_{id} nonce when these hooks fire.
 function minepic_profile_save( $user_id ) {
 	if ( current_user_can( 'edit_user', $user_id ) && isset( $_POST['minepic_username'] ) ) {
-		minepic_save_username( (int) $user_id, wp_unslash( $_POST['minepic_username'] ) );
+		minepic_save_username((int) $user_id, sanitize_text_field(wp_unslash($_POST['minepic_username'])));
 	}
 }
 add_action( 'personal_options_update', 'minepic_profile_save' );
@@ -175,13 +174,11 @@ add_shortcode(
 		$user_id = get_current_user_id();
 		$notice  = '';
 
-        $input_minecraft_username = null;
-        if (isset($_POST['minepic_username'])) {
-            $input_minecraft_username = sanitize_text_field($_POST['minepic_username']);
-        }
-
-		if (null !== $input_minecraft_username && wp_verify_nonce( wp_unslash($input_minecraft_username) ?? '', 'minepic_save' )) {
-			$ok     = minepic_save_username( $user_id, wp_unslash( $input_minecraft_username ) );
+		if (
+			isset( $_POST['minepic_username'], $_POST['minepic_nonce'] )
+			&& wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['minepic_nonce'] ) ), 'minepic_save' )
+		) {
+			$ok     = minepic_save_username( $user_id, sanitize_text_field(wp_unslash( $_POST['minepic_username'] )) );
 			$notice = $ok
 				? '<p>Saved.</p>'
 				: '<p>Saved, but the format is invalid: your avatar will use your login name or Steve/Alex.</p>';

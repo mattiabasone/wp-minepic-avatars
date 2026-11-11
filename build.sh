@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-mkdir -p ./build/minepic-avatars
-rm -rf ./build/minepic-avatars/*
+PLUGIN_SLUG=minepic-avatars-for-minecraft
 
-cp -R assets/ ./build/minepic-avatars/assets
-cp readme.txt ./build/minepic-avatars/readme.txt
-cp minepic-avatars.php ./build/minepic-avatars/minepic-avatars.php
+mkdir -p ./build/${PLUGIN_SLUG}
+rm -rf ./build/${PLUGIN_SLUG}/*
+
+cp -R assets/ ./build/${PLUGIN_SLUG}/assets
+cp readme.txt ./build/${PLUGIN_SLUG}/readme.txt
+cp minepic-avatars.php ./build/${PLUGIN_SLUG}/minepic-avatars.php
